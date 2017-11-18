@@ -54,6 +54,7 @@ def apply_mutation(seq, mutation):
 def gen_seq_arr(GENE):
     with open("genes/" + GENE + ".seq") as f_in:
         gene_seq = ''.join(map(str.rstrip, f_in.readlines()))
+    seq_arr = [(GENE, gene_seq)]
         
     csv_f = pd.read_csv("genes_mutations/" + GENE + "_mutations.csv", delimiter='\t')
     csv_f = csv_f[csv_f['Primary site'] == 'lung']
@@ -61,7 +62,6 @@ def gen_seq_arr(GENE):
         print ("Gene " + GENE + " has length " + str(len(gene_seq)) + \
             ", but mutations are expected to have " + str(csv_f['Gene CDS length'].unique()[0]))
         return None, None
-    seq_arr = []
     c = Counter()
     for mutation in csv_f['Mutation CDS']:
         new_seq, m_type = apply_mutation(gene_seq, mutation)

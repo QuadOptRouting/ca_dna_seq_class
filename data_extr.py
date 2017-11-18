@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-@author: peterrr
+Created on Sat Nov 18 16:00:56 2017
+
+@author: Admin
 """
 
 import os

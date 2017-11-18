@@ -66,7 +66,7 @@ def gen_seq_arr(GENE):
     for mutation in csv_f['Mutation CDS']:
         new_seq, m_type = apply_mutation(gene_seq, mutation)
         if new_seq:
-            seq_arr.append(str(new_seq))
+            seq_arr.append((GENE + "_" + m_type, str(new_seq)))
             c[m_type] += 1
     return seq_arr, c
 
@@ -75,5 +75,7 @@ for GENE in GENES:
     if seq_arr:
         print("Gene " + GENE + " has " + str(len(seq_arr)) + " mutant variants: {}".format(c))
         s = "enc_gene_" + GENE + ".csv"
-        gene_out = open(s, "w")
-        gene_out.write(str(seq_arr))
+        with open(s, "w") as gene_out:
+            for seq_tup in seq_arr:
+                m_type, seq = seq_tup
+                gene_out.write(m_type + '\t' + seq + '\n')

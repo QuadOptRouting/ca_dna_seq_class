@@ -7,6 +7,8 @@ Created on Sun Nov 19 02:52:06 2017
 
 import os
 import pickle
+import pandas as pd
+import csv
 
 GENES = map(lambda s: s.replace('.seq', ''), os.listdir("genes"))
 genedict = {}
@@ -14,46 +16,69 @@ genedict = {}
 for i, gene in enumerate(GENES):
     genedict[i] = gene
 
-mutated_genes = []
+mutated_genes = {}
+ii = 0
 
 for i in range(len(genedict)):
     s = "enc_gene_" + genedict[i] + ".csv"
     print (s)
     if os.path.isfile(s):
-        mutated_genes.append(i)
-        
-def sampling(g_dict, m_genes):
+        mutated_genes[ii] = genedict[i]
+        ii += 1
+
+
+print mutated_genes
+
+ii = 0
+
+
+def sampling(g_dict):
     non_mutated = {}
     concat = {}
+    gene_tables = {}
+    f = open("conc.csv", 'wb')
     for i in xrange(len(g_dict)):
-        f = open("genes/" + str(g_dict[i]) + ".csv", "rb")
-        non_mutated[i] = f.read()
-        
-    for i in mutated_genes:
+        gene_tables[i] = pd.read_csv("enc_gene_" + str(g_dict[i]) + ".csv", sep='\t', header=None, names=['name', 'sequence'])
+        non_mutated[i] = gene_tables[i].iloc[0]['sequence']
 
+    # for i in xrange(len(g_dict)):
+    #     temp = gene_tables[i]['sequence']
+    #     tmp = 0.
+    #     for s in temp:
+    #         tmp += len(s)
+    #     print tmp/temp.shape[0]
+
+    for i in mutated_genes:
         current_gene = g_dict[i]
-        f = pickle.load(open(s = "enc_gene_" + g_dict[i] + ".csv"),"rb")
+        print current_gene
+        concat[current_gene] = []
         
         new_first_part = str()
         new_second_part = str()
         
-        for x in xrange(g_dict[i]):
-            new_first_part += str(x)
-            
-        for x in range(g_dict[i] + 1, len(g_dict)):
-            new_second_part += str(x)
-                
-        n = f.shape[0]
-
-        for j in xrange(n):
+        for x in xrange(i):
+            new_first_part += str(non_mutated[x])
+        for x in range(i + 1, len(g_dict)):
+            new_second_part += str(non_mutated[x])
+        n = gene_tables[i].shape[0]
+        flg = True
+        for j in xrange(1, n):
             new_seq = new_first_part
-            
-            if ((f[0,j] == ( str(g_dict[i]) + "_sub" ) ) ):  
-                
-                new_seq += str(f[1,j])
+            if flg:
+                flg = False
+            if gene_tables[i].iloc[j]['name'] == (g_dict[i] + "_sub"):
+                new_seq += gene_tables[i].iloc[j]['sequence']
                 new_seq += new_second_part
-            
-            concat[g_dict[i]].append(new_seq)
-        
-    pickle.dump(concat, open("concat" + ".csv", "wb"))
+            #print len(new_seq)
+            concat[current_gene].append(new_seq)
+        # print len(concat[current_gene])
+    for gen in concat:
+
+        #writer = csv.writer(f, delimiter= '\t', lineterminator='\n')
+        for item in concat[gen]:
+            f.write(gen + '\t' + item + '\n')
+    f.close()
+    pickle.dump(concat, open("concat.csv", "wb"))
     
+
+sampling(mutated_genes)

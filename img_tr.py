@@ -37,7 +37,7 @@ class Gene_transform:
     """is voss - flag for precomputed voss; if true => genes is voss array else genes is string;
        for string of lenght N returns array of shape (3, N)"""
     
-    def _z_curve(self, genes, is_voss=False):
+    def _z_curve(self, genes, is_voss=False, i = 1):
         if(not is_voss):
             voss = self._voss(genes)
         else:
@@ -49,7 +49,9 @@ class Gene_transform:
         x_r = voss[0] - voss[1] + voss[2] - voss[3]
         x_g = voss[0] + voss[1] - voss[2] - voss[3]
         x_b = voss[0] - voss[1] - voss[2] + voss[3]
-        return np.array([x_r, x_b, x_g])
+        res = np.array([x_r, x_g, x_b])  
+        res.tofile("obs/" + str(i) + ".txt",",","%s") #export for txt
+        return res
     
     """Attention! No cumulative option in tetrahedron; It won't work properly, don't use it"""
     def _tetrahedron(self, genes, is_voss=False):
@@ -62,7 +64,7 @@ class Gene_transform:
         x_r = 2.0**0.5/3.0 * (2.0 * voss[3] - voss[1] - voss[2])
         x_g = 6.0**0.5/3.0 * (voss[1] - voss[2])
         x_b = 1.0/3.0 * (3.0 * voss[0] - voss[1] - voss[2] - voss[3])
-        return np.array([x_r, x_b, x_g])  
+        return np.array([x_r, x_g, x_b])  
     
     """cases: small_square, big_square, rectangle"""
     def _z_curve_to_img(self, z_curve, case="big_square"):

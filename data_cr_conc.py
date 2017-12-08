@@ -66,7 +66,7 @@ def sampling(g_dict):
             new_seq = new_first_part
             if flg:
                 flg = False
-            if gene_tables[i].iloc[j]['name'] == (g_dict[i] + "_sub"):
+            if gene_tables[i].iloc[j]['name'] in (g_dict[i] + "_sub_N", g_dict[i] + "_sub_P"):
                 new_seq += gene_tables[i].iloc[j]['sequence']
                 new_seq += new_second_part
             #print len(new_seq)
